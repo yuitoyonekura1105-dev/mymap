@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>地元のおすすめスポット共有MAP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+    <link rel="stylesheet" href="kadai1.css"> 
+</head>
+<body>
+    <div id="map"></div>
+
+    <div id="ui-container">
+        <div id="list-container">
+            <div class="list-header">
+                <h3>🕒 最新のタイムライン</h3>
+                <button id="show-form-btn">＋ 投稿する</button>
+            </div>
+            <div id="spot-list-items"></div>
+        </div>
+
+        <div id="post-form-container" style="display: none;">
+            <div class="form-header">
+                <h3>📍 スポットを登録</h3>
+                <button id="hide-form-btn">×</button>
+            </div>
+            <p id="coords-display">地図をクリックして場所を選択</p>
+            <form id="spot-form">
+                <input type="text" id="spot-name" placeholder="スポット名（店名など）" required>
+                <select id="spot-category">
+                    <option value="🍽️ グルメ">🍽️ グルメ</option>
+                    <option value="🏞️ 絶景・風景">🏞️ 絶景・風景</option>
+                    <option value="🛍️ ショッピング">🛍️ ショッピング</option>
+                    <option value="🏛️ 歴史・文化">🏛️ 歴史・文化</option>
+                    <option value="☕ カフェ・休憩">☕ カフェ・休憩</option>
+                    <option value="✨ その他">✨ その他</option>
+                </select>
+                <textarea id="spot-comment" placeholder="今どうしてる？（おすすめを記入）" required></textarea>
+                <div style="font-size:12px; margin-bottom:5px;">写真を選択 (任意):</div>
+                <input type="file" id="spot-photo-file" accept="image/*">
+                <button type="submit" id="submit-btn" disabled>投稿を完了する</button>
+            </form>
+        </div>
+    </div>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js'></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-language/v1.0.0/mapbox-gl-language.js'></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <script src="kadai1.js"></script> 
+</body>
+</html>

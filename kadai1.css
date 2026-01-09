@@ -1,0 +1,47 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding: 0; font-family: sans-serif; overflow: hidden; background: #f7f9f9; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 0; }
+
+/* PC向け配置 */
+#ui-container {
+    position: absolute; top: 10px; right: 10px; width: 350px;
+    max-height: 95vh; z-index: 10; display: flex; flex-direction: column; gap: 12px;
+}
+
+#post-form-container, #list-container {
+    background: white; padding: 18px; border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%;
+}
+
+#list-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+#spot-list-items { overflow-y: auto; flex-grow: 1; margin-top: 10px; }
+
+.list-header, .form-header { display: flex; justify-content: space-between; align-items: center; }
+h3 { font-size: 17px; margin: 0; }
+
+#show-form-btn { background: #1d9bf0; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+#hide-form-btn { background: none; border: none; font-size: 22px; color: #536471; cursor: pointer; }
+
+input, select, textarea { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #cfd9de; }
+#submit-btn { width: 100%; background: #1d9bf0; color: white; border: none; padding: 12px; border-radius: 25px; font-weight: bold; cursor: pointer; }
+#submit-btn:disabled { background: #8ecdf8; }
+
+.spot-list-item { border: 1px solid #eff3f4; border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+.user-name { font-weight: bold; font-size: 14px; }
+.category-badge { background: #f0f3f4; color: #536471; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+.post-img { width: 100%; border-radius: 10px; margin-top: 8px; }
+
+.card-actions { display: flex; justify-content: space-between; margin-top: 8px; border-top: 1px solid #eff3f4; padding-top: 8px; }
+.action-btn { background: none; border: none; font-size: 12px; color: #536471; cursor: pointer; text-decoration: none; }
+
+/* ★スマホ用設定 (画面幅が768px以下のとき) */
+@media (max-width: 768px) {
+    #ui-container {
+        top: auto; right: 0; bottom: 0; left: 0; width: 100%;
+        max-height: 50vh; gap: 0;
+    }
+    #post-form-container, #list-container {
+        border-radius: 20px 20px 0 0;
+        max-height: 50vh;
+    }
+}
