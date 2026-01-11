@@ -14,11 +14,8 @@ const markers = {};
 
 map.addControl(new MapboxLanguage({ defaultLanguage: 'ja' }));
 map.addControl(new MapboxGeocoder({ 
-    accessToken: mapboxgl.accessToken, 
-    mapboxgl: mapboxgl, 
-    placeholder: '場所を検索', 
-    language: 'ja', 
-    countries: 'jp'
+    accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl, 
+    placeholder: '場所を検索', language: 'ja', countries: 'jp'
 }), 'top-left');
 map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }), 'top-right');
 
@@ -26,12 +23,20 @@ const postFormContainer = document.getElementById('post-form-container');
 const listContainer = document.getElementById('list-container');
 const showFormBtn = document.getElementById('show-form-btn');
 
-// フォームの表示切り替え（スマホ時にリストを隠す）
+// 表示切り替えの修正
 const toggleForm = (show) => {
-    postFormContainer.style.display = show ? 'block' : 'none';
-    if (window.innerWidth <= 768) {
-        listContainer.style.display = show ? 'none' : 'flex';
-        showFormBtn.style.display = show ? 'none' : 'block';
+    if (show) {
+        postFormContainer.style.display = 'block';
+        listContainer.style.display = 'none';
+        showFormBtn.style.display = 'none';
+    } else {
+        postFormContainer.style.display = 'none';
+        listContainer.style.display = 'block';
+        showFormBtn.style.display = 'block';
+        // フォームのリセット
+        document.getElementById('spot-form').reset();
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('coords-display').innerText = "地図をクリックして場所を選択してください";
     }
 };
 
@@ -61,10 +66,9 @@ function renderSpots() {
     if (currentTab === 'latest') spots.sort((a, b) => b.id - a.id);
     else spots.sort(() => Math.random() - 0.5);
 
-    spots.slice(0, 10).forEach(spot => {
+    spots.forEach(spot => {
         const el = document.createElement('div');
-        el.className = 'marker';
-        el.style.cssText = `background:${categoryColors[spot.category]}; width:24px; height:24px; border-radius:50%; border:2px solid white; cursor:pointer;`;
+        el.style.cssText = `background:${categoryColors[spot.category] || '#1d9bf0'}; width:24px; height:24px; border-radius:50%; border:2px solid white; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);`;
 
         el.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -76,8 +80,8 @@ function renderSpots() {
         const item = document.createElement('div');
         item.className = 'spot-list-item';
         item.innerHTML = `
-            <div onclick="map.flyTo({center:[${spot.lng},${spot.lat}], zoom:16}); showDetail(${JSON.stringify(spot).replace(/"/g, '&quot;')})">
-                <span style="font-weight:bold;">${spot.name}</span><span class="category-badge">${spot.category}</span>
+            <div onclick="showDetailById(${spot.id})">
+                <span style="font-weight:bold;">${spot.name}</span> <small style="color:#536471;">${spot.category}</small>
                 <div style="font-size:13px; color:#536471; margin-top:4px;">${spot.comment.substring(0,30)}...</div>
             </div>`;
         listElement.appendChild(item);
@@ -89,18 +93,24 @@ window.showDetail = (spot) => {
     const content = document.getElementById('detail-content');
     content.innerHTML = `
         <h3 style="margin:0 0 10px 0;">${spot.name}</h3>
-        <p style="font-size:14px; color:#536471;">${spot.category}</p>
-        <p style="font-size:15px; line-height:1.5;">${spot.comment}</p>
-        ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius:12px; margin-bottom:10px;">` : ''}
+        <p style="font-size:14px; color:#536471; margin-bottom:5px;">${spot.category}</p>
+        <p style="font-size:15px; line-height:1.5; margin-bottom:15px;">${spot.comment}</p>
+        ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius:12px; margin-bottom:15px; max-height:200px; object-fit:cover;">` : ''}
         <div style="display:flex; flex-wrap:wrap; gap:8px;">
             <button class="action-btn" onclick="likeSpot(${spot.id})">❤️ <span id="like-count-${spot.id}">${spot.likes||0}</span></button>
             <button class="action-btn" onclick="speakSpot(${spot.id})">🔊 読み上げ</button>
-            <a href="https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}" target="_blank" class="action-btn">🌐 GoogleMap</a>
+            <a href="https://www.google.com/maps?q=${spot.lat},${spot.lng}" target="_blank" class="action-btn">🌐 GoogleMap</a>
             <button class="action-btn" onclick="deleteSpot(${spot.id})" style="color:red; border-color:red;">🗑️ 削除</button>
         </div>
     `;
     panel.style.display = 'block';
+    toggleForm(false);
     map.flyTo({ center: [spot.lng, spot.lat], zoom: 16 });
+};
+
+window.showDetailById = (id) => {
+    const spot = getSavedSpots().find(s => s.id === id);
+    if(spot) showDetail(spot);
 };
 
 map.on('click', (e) => {
@@ -108,6 +118,9 @@ map.on('click', (e) => {
     selectedLngLat = e.lngLat;
     document.getElementById('coords-display').innerText = `📍 場所を選択しました`;
     document.getElementById('submit-btn').disabled = false;
+    if (postFormContainer.style.display === 'none') {
+        toggleForm(true);
+    }
 });
 
 document.getElementById('spot-form').addEventListener('submit', async (e) => {
@@ -128,8 +141,7 @@ document.getElementById('spot-form').addEventListener('submit', async (e) => {
     });
 
     localStorage.setItem('touristSpots', JSON.stringify(spots));
-    e.target.reset();
-    toggleForm(false);
+    toggleForm(false); // これでリストが表示される
     renderSpots();
 });
 
@@ -156,7 +168,7 @@ window.speakSpot = (id) => {
     const spot = getSavedSpots().find(x => x.id === id);
     if (!spot) return;
     window.speechSynthesis.cancel();
-    const uttr = new SpeechSynthesisUtterance(`${spot.name}。${spot.comment}`);
+    const uttr = new SpeechSynthesisUtterance(`${spot.name}。おすすめポイントは、${spot.comment}`);
     uttr.lang = 'ja-JP';
     window.speechSynthesis.speak(uttr);
 };
