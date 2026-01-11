@@ -1,8 +1,8 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
     margin: 0; padding: 0;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-    overflow: hidden; background: #f7f9f9; color: #0f1419;
+    font-family: sans-serif;
+    overflow: hidden; background: #f7f9f9;
 }
 #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 0; }
 
@@ -14,24 +14,22 @@ body {
 
 #post-form-container, #list-container {
     background: white; padding: 18px; border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
-
-#list-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-#spot-list-items { overflow-y: auto; flex-grow: 1; margin-top: 10px; }
 
 #show-form-btn { 
-    background: #1d9bf0; color: white; border: none; padding: 14px; 
-    border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px;
-    box-shadow: 0 4px 12px rgba(29, 155, 240, 0.3);
+    position: absolute; top: 20px; right: 385px; /* PCではリストの左横 */
+    z-index: 100; background: #1d9bf0; color: white; border: none; 
+    padding: 15px 25px; border-radius: 30px; font-weight: bold; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer;
 }
 
-/* モバイル対応のメディアクエリ */
+/* スマホ対応（画面下部に配置） */
 @media (max-width: 768px) {
     #ui-container {
         top: auto !important; bottom: 0; left: 0; right: 0; width: 100%;
-        max-height: 50vh; background: white; border-radius: 20px 20px 0 0;
-        box-shadow: 0 -4px 15px rgba(0,0,0,0.1); padding: 10px 15px 20px 15px;
+        max-height: 40vh; background: white; border-radius: 20px 20px 0 0;
+        padding: 10px 15px; z-index: 10;
     }
     
     .mobile-handle {
@@ -39,46 +37,37 @@ body {
         margin: 0 auto 10px;
     }
 
-    #list-container { box-shadow: none; padding: 0; }
-
     #show-form-btn {
-        position: fixed; bottom: 52vh; right: 20px; width: auto;
-        padding: 12px 20px; z-index: 100;
+        top: auto; right: 20px; bottom: 20px; /* ★ここを調整：右下に固定 */
+        width: 70px; height: 70px; border-radius: 50%; /* 丸いボタンに */
+        padding: 0; font-size: 14px;
+        box-shadow: 0 4px 15px rgba(29, 155, 240, 0.5);
     }
 
     #post-form-container {
-        position: fixed; top: 10%; left: 5%; width: 90%;
-        max-height: 80vh; overflow-y: auto; z-index: 1000;
+        position: fixed; top: 5%; left: 5%; width: 90%;
+        max-height: 85vh; overflow-y: auto; z-index: 1000;
     }
 
     #spot-detail-panel {
-        top: 50% !important; left: 50% !important; transform: translate(-50%, -50%);
-        width: 90% !important; position: fixed !important;
+        bottom: 20px !important; top: auto !important; left: 5% !important;
+        width: 90% !important; transform: none !important;
     }
 }
 
-/* 詳細パネルのスタイル */
+/* 詳細パネル・タブ・その他 */
 #spot-detail-panel {
-    position: absolute; top: 70px; left: 20px; width: 300px;
+    position: absolute; top: 70px; left: 20px; width: 320px;
     background: white; z-index: 100; padding: 20px; border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
-.close-detail { float: right; border: none; background: none; font-size: 24px; cursor: pointer; color: #536471; }
-
-/* 共通パーツ */
-.tab-container { display: flex; border-bottom: 1px solid #eff3f4; margin-bottom: 10px; }
-.tab-btn { flex: 1; padding: 12px; background: none; border: none; cursor: pointer; font-weight: bold; color: #536471; position: relative; }
-.tab-btn.active { color: #1d9bf0; }
-.tab-btn.active::after { content: ""; position: absolute; bottom: 0; left: 10%; width: 80%; height: 3px; background: #1d9bf0; border-radius: 3px; }
-
-.spot-list-item { border-bottom: 1px solid #eff3f4; padding: 12px 0; animation: fadeInUp 0.4s ease; }
-.category-badge { background: #f0f3f4; color: #536471; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 5px; }
-.action-btn { background: none; border: 1px solid #cfd9de; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; margin-right: 5px; text-decoration: none; display: inline-block; color: #0f1419; }
-
-input, select, textarea { width: 100%; margin-bottom: 12px; padding: 12px; border-radius: 8px; border: 1px solid #cfd9de; font-size: 16px; }
-#submit-btn { width: 100%; background: #1d9bf0; color: white; border: none; padding: 14px; border-radius: 30px; font-weight: bold; }
-#submit-btn:disabled { background: #8ecdf8; }
-
-@keyframes splash-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-.fade-out { opacity: 0; visibility: hidden; transition: 0.8s; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.close-detail { float: right; border: none; background: none; font-size: 24px; cursor: pointer; }
+.tab-container { display: flex; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+.tab-btn { flex: 1; padding: 10px; background: none; border: none; font-weight: bold; color: #555; }
+.tab-btn.active { color: #1d9bf0; border-bottom: 3px solid #1d9bf0; }
+.spot-list-item { border-bottom: 1px solid #f0f0f0; padding: 12px 0; }
+.category-badge { font-size: 10px; background: #eee; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+.action-btn { font-size: 12px; margin: 5px 5px 0 0; padding: 5px 10px; border-radius: 15px; border: 1px solid #ddd; background: white; text-decoration: none; display: inline-block; color: black; }
+input, select, textarea { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
+#submit-btn { width: 100%; background: #1d9bf0; color: white; border: none; padding: 12px; border-radius: 25px; font-weight: bold; }
+.fade-out { opacity: 0; visibility: hidden; transition: 0.5s; }
