@@ -10,9 +10,7 @@
 </head>
 <body>
     <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #e9967a; display: flex; justify-content: center; align-items: center; z-index: 99999;">
-        <div style="text-align: center;">
-            <h1 class="splash-title" style="color: white; font-size: 2rem; animation: splash-pulse 1.5s infinite;">マップロード中...</h1>
-        </div>
+        <h1 class="splash-title" style="color: white; font-size: 2rem; animation: splash-pulse 1.5s infinite;">マップロード中...</h1>
     </div>
     
     <div id="map"></div>
@@ -25,6 +23,7 @@
                 <button id="tab-latest" class="tab-btn active" onclick="switchTab('latest')">最新</button>
                 <button id="tab-recommend" class="tab-btn" onclick="switchTab('recommend')">おすすめ</button>
             </div>
+            
             <input type="text" id="spot-search" placeholder="投稿を検索...">
             <div id="spot-list-items"></div>
         </div>
@@ -34,7 +33,7 @@
                 <h3>📍 スポットを登録</h3>
                 <button id="hide-form-btn">×</button>
             </div>
-            <p id="coords-display">地図をクリックして場所を選択</p>
+            <p id="coords-display" style="font-size:12px; color:#1d9bf0; margin:5px 0;">地図をクリックして場所を選択</p>
             <form id="spot-form">
                 <input type="text" id="spot-name" placeholder="スポット名" required>
                 <select id="spot-category">
@@ -52,7 +51,7 @@
         </div>
     </div>
 
-    <button id="show-form-btn">＋ 投稿</button>
+    <button id="show-form-btn">＋投稿</button>
 
     <div id="spot-detail-panel" style="display:none;">
         <button onclick="document.getElementById('spot-detail-panel').style.display='none'" class="close-detail">×</button>
