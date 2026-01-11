@@ -9,30 +9,35 @@
     <link rel="stylesheet" href="kadai1.css"> 
 </head>
 <body>
-    <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #e9967a; display: flex; justify-content: center; align-items: center; z-index: 99999;">
-        <h1 class="splash-title" style="color: white; font-size: 2rem; animation: splash-pulse 1.5s infinite;">マップロード中...</h1>
+    <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #e9967a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999;">
+        <div style="font-size: 50px; margin-bottom: 20px;">🗺️</div>
+        <h1 style="color: white; font-size: 1.2rem; letter-spacing: 2px;">LOADING...</h1>
     </div>
+
     <div id="map"></div>
 
-<div id="ui-container">
-    <button id="show-form-btn" style="width: 100%; margin-bottom: 10px; padding: 12px; font-size: 16px;">＋ スポットを投稿する</button>
-
-    <div id="list-container">
-        <div style="display: flex; ">
-            <button id="tab-latest" class="tab-btn active" onclick="switchTab('latest')">最新</button>
-            <button id="tab-recommend" class="tab-btn" onclick="switchTab('recommend')">おすすめ</button>
+    <div id="ui-container">
+        <div class="mobile-action-bar">
+            <button id="show-list-btn">🕒 タイムライン</button>
+            <button id="show-form-btn">＋ 投稿する</button>
         </div>
-        
-        <input type="text" id="spot-search" placeholder="投稿を検索..." style="margin-bottom:10px;">
-        <div id="spot-list-items"></div>
-    </div>
 
-    <div id="post-form-container" style="display: none;">
+        <div id="list-container">
+            <div class="modal-pull-bar"></div>
+            <div class="list-header">
+                <h3>🕒 最新のタイムライン</h3>
+                <button class="panel-close-btn" onclick="togglePanel('list', false)">×</button>
+            </div>
+            <div id="spot-list-items"></div>
+        </div>
+
+        <div id="post-form-container">
+            <div class="modal-pull-bar"></div>
             <div class="form-header">
                 <h3>📍 スポットを登録</h3>
-                <button id="hide-form-btn">×</button>
+                <button class="panel-close-btn" onclick="togglePanel('form', false)">×</button>
             </div>
-            <p id="coords-display">地図をクリックして場所を選択</p>
+            <p id="coords-display">地図をタップして場所を選択</p>
             <form id="spot-form">
                 <input type="text" id="spot-name" placeholder="スポット名（店名など）" required>
                 <select id="spot-category">
@@ -44,17 +49,19 @@
                     <option value="✨ その他">✨ その他</option>
                 </select>
                 <textarea id="spot-comment" placeholder="おすすめポイントを記入してください" required></textarea>
-		<input type="url" id="spot-link" placeholder="webURL(任意)※URLのみ記載できます！">
-                <div style="font-size:12px; margin-bottom:5px;">写真を選択 (任意):</div>
+                <input type="url" id="spot-link" placeholder="WebサイトURL(任意)">
+                <div style="font-size:12px; margin-bottom:5px;">写真を選択:</div>
                 <input type="file" id="spot-photo-file" accept="image/*">
                 <button type="submit" id="submit-btn" disabled>投稿を完了する</button>
             </form>
         </div>
     </div>
-<div id="spot-detail-panel" style="display:none; position:absolute; top:70px; left:10px; width:280px; background:white; z-index:20; padding:15px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
-    <button onclick="document.getElementById('spot-detail-panel').style.display='none'" style="float:right; border:none; background:none; cursor:pointer;">×</button>
-    <div id="detail-content"></div>
-</div>
+
+    <div id="spot-detail-panel" style="display:none;">
+        <div class="modal-pull-bar mobile-only"></div>
+        <button onclick="document.getElementById('spot-detail-panel').style.display='none'" class="detail-close-btn">×</button>
+        <div id="detail-content"></div>
+    </div>
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js'></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-language/v1.0.0/mapbox-gl-language.js'></script>
