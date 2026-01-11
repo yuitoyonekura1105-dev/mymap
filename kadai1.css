@@ -42,33 +42,63 @@ input, select, textarea { width: 100%; margin-bottom: 10px; padding: 10px; borde
 .card-actions { display: flex; justify-content: space-between; margin-top: 8px; border-top: 1px solid #eff3f4; padding-top: 8px; }
 .action-btn { background: none; border: none; font-size: 12px; color: #536471; cursor: pointer; text-decoration: none; }
 
-/* ★スマホ用設定 (画面幅が768px以下のとき) */
-/* ★スマホ用設定 (画面幅が768px以下のとき) */
+/* --- ★スマホ用設定 (画面幅が768px以下のとき) --- */
 @media (max-width: 768px) {
-    /* パネルの親要素を画面下部に固定 */
-    #ui-container {
-        top: auto !important; /* PC版のtop: 60pxを解除 */
-        right: 0;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        max-height: 70vh; /* 画面の7割まで広げる */
-        gap: 0;
+    /* 全体の位置を「下」に固定し、PC版の「上から60px」を強制解除 */
+    #ui-container, #spot-detail-panel {
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-height: 80vh !important; /* 画面の8割まで表示可能にする */
         z-index: 2000;
+        margin: 0;
     }
 
-    /* リストとフォームの枠をスマホ最適化 */
+    /* フォームとリストをスマホらしい「引き出し」デザインに */
     #post-form-container, #list-container {
-        border-radius: 20px 20px 0 0;
-        max-height: 70vh; /* 高さをしっかり確保 */
-        overflow-y: auto; /* 中身が溢れたらスクロールさせる */
-        display: none; /* JSで制御するため一旦消す（active時に出す） */
+        border-radius: 20px 20px 0 0 !important;
+        padding: 15px;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        display: none; /* JSの制御に合わせる */
+        flex-direction: column;
     }
 
-    /* 表示中のパネルだけを見せる設定 */
+    /* アクティブな方だけを表示 */
     #list-container.active, #post-form-container.active {
         display: flex !important;
     }
+
+    /* スクロールをスムーズにする */
+    #spot-list-items {
+        max-height: 60vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* タブボタンを押しやすく大きく */
+    .tab-btn {
+        padding: 15px 5px;
+        font-size: 16px;
+    }
+}
+
+/* --- 追加：スマホ用の「つまみ」バー --- */
+.modal-pull-bar {
+    display: none; /* 基本は非表示 */
+}
+
+@media (max-width: 768px) {
+    .modal-pull-bar {
+        display: block;
+        width: 40px;
+        height: 5px;
+        background: #e1e8ed;
+        border-radius: 10px;
+        margin: 0 auto 10px;
+    }
+}
 
     /* 詳細パネルもスマホで見やすい位置に */
     #spot-detail-panel {
@@ -236,3 +266,4 @@ input, select, textarea { width: 100%; margin-bottom: 10px; padding: 10px; borde
     margin-bottom: 10px;
     border-bottom: 1px solid #f0f0f0; /* 非常に薄いグレーの土台線 */
 }
+
