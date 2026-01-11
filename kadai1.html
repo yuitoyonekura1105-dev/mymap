@@ -3,50 +3,54 @@
 <head>
     <meta charset="utf-8">
     <title>地元のおすすめスポット共有MAP</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
     <link rel="stylesheet" href="kadai1.css"> 
 </head>
 <body>
-    <div id="splash-screen">
-        <h1 class="splash-title">マップロード中...</h1>
+    <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #e9967a; display: flex; justify-content: center; align-items: center; z-index: 99999;">
+        <div style="text-align: center;">
+            <h1 class="splash-title" style="color: white; font-size: 2rem; animation: splash-pulse 1.5s infinite;">マップロード中...</h1>
+            <p style="color: white; font-size: 0.9rem;">素敵なスポットを探し中</p>
+        </div>
     </div>
-
+    
     <div id="map"></div>
 
-    <div class="mobile-tabs">
-        <button id="tab-list-btn">🕒 タイムライン</button>
-        <button id="tab-post-btn" style="background: #1d9bf0; color: white;">＋ 投稿する</button>
-    </div>
-
     <div id="ui-container">
+        <div class="mobile-handle"></div>
+        
+        <button id="show-form-btn">＋ スポットを投稿する</button>
+
         <div id="list-container">
-            <div class="modal-pull-bar mobile-only"></div>
-            <div class="list-header">
-                <h3>🕒 最新のタイムライン</h3>
-                <button class="mobile-only panel-close-x" onclick="closeAllPanels()">×</button>
+            <div class="tab-container">
+                <button id="tab-latest" class="tab-btn active" onclick="switchTab('latest')">最新</button>
+                <button id="tab-recommend" class="tab-btn" onclick="switchTab('recommend')">おすすめ</button>
             </div>
+            
+            <input type="text" id="spot-search" placeholder="投稿を検索...">
             <div id="spot-list-items"></div>
         </div>
 
-        <div id="post-form-container">
-            <div class="modal-pull-bar mobile-only"></div>
+        <div id="post-form-container" style="display: none;">
             <div class="form-header">
                 <h3>📍 スポットを登録</h3>
-                <button class="panel-close-x" onclick="closeAllPanels()">×</button>
+                <button id="hide-form-btn">×</button>
             </div>
-            <p id="coords-display">地図をタップして場所を選択</p>
+            <p id="coords-display">地図をクリックして場所を選択</p>
             <form id="spot-form">
-                <input type="text" id="spot-name" placeholder="スポット名（店名など）" required>
+                <input type="text" id="spot-name" placeholder="スポット名（店名など）" required enterkeyhint="next">
                 <select id="spot-category">
                     <option value="🍽️ グルメ">🍽️ グルメ</option>
                     <option value="🏞️ 絶景・風景">🏞️ 絶景・風景</option>
                     <option value="🛍️ ショッピング">🛍️ ショッピング</option>
+                    <option value="🏛️ 歴史・文化">🏛️ 歴史・文化</option>
                     <option value="☕ カフェ・休憩">☕ カフェ・休憩</option>
                     <option value="✨ その他">✨ その他</option>
                 </select>
-                <textarea id="spot-comment" placeholder="おすすめポイントを記入してください" required></textarea>
+                <textarea id="spot-comment" placeholder="おすすめポイントを記入してください" required rows="3"></textarea>
+                <input type="url" id="spot-link" placeholder="webURL(任意) ※URLのみ">
                 <div style="font-size:12px; margin-bottom:5px;">写真を選択 (任意):</div>
                 <input type="file" id="spot-photo-file" accept="image/*">
                 <button type="submit" id="submit-btn" disabled>投稿を完了する</button>
@@ -55,8 +59,7 @@
     </div>
 
     <div id="spot-detail-panel" style="display:none;">
-        <div class="modal-pull-bar mobile-only"></div>
-        <button onclick="document.getElementById('spot-detail-panel').style.display='none'" class="panel-close-x">×</button>
+        <button onclick="document.getElementById('spot-detail-panel').style.display='none'" class="close-detail">×</button>
         <div id="detail-content"></div>
     </div>
 
