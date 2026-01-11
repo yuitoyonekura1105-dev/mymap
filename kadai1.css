@@ -14,60 +14,73 @@ body {
 
 #post-form-container, #list-container {
     background: white; padding: 18px; border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%;
 }
+
+#list-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+#spot-list-items { overflow-y: auto; flex-grow: 1; margin-top: 10px; }
 
 #show-form-btn { 
-    position: absolute; top: 20px; right: 385px; /* PCではリストの左横 */
-    z-index: 100; background: #1d9bf0; color: white; border: none; 
-    padding: 15px 25px; border-radius: 30px; font-weight: bold; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer;
+    position: absolute; top: 20px; right: 385px; z-index: 100;
+    background: #1d9bf0; color: white; border: none; padding: 15px 25px; 
+    border-radius: 30px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer;
 }
 
-/* スマホ対応（画面下部に配置） */
+/* スマホ対応：ボトムシート形式 */
 @media (max-width: 768px) {
     #ui-container {
         top: auto !important; bottom: 0; left: 0; right: 0; width: 100%;
-        max-height: 40vh; background: white; border-radius: 20px 20px 0 0;
-        padding: 10px 15px; z-index: 10;
+        max-height: 45vh; /* 画面の下半分弱 */
+        background: white; border-radius: 24px 24px 0 0;
+        padding: 8px 16px 20px 16px; z-index: 10;
+        display: block; /* Flexを解除して横並びを防ぐ */
     }
     
     .mobile-handle {
-        width: 40px; height: 5px; background: #ccc; border-radius: 10px;
-        margin: 0 auto 10px;
+        width: 40px; height: 4px; background: #e0e0e0; border-radius: 10px;
+        margin: 0 auto 12px;
     }
 
+    #list-container { box-shadow: none; padding: 0; height: 100%; display: flex; flex-direction: column; }
+    
+    #spot-list-items { max-height: 30vh; }
+
     #show-form-btn {
-        top: auto; right: 20px; bottom: 20px; /* ★ここを調整：右下に固定 */
-        width: 70px; height: 70px; border-radius: 50%; /* 丸いボタンに */
-        padding: 0; font-size: 14px;
-        box-shadow: 0 4px 15px rgba(29, 155, 240, 0.5);
+        top: auto; right: 15px; bottom: 15px; /* 右下の位置 */
+        width: 60px; height: 60px; border-radius: 50%; /* 丸ボタン */
+        padding: 0; font-size: 13px; z-index: 1000;
+        box-shadow: 0 4px 20px rgba(29, 155, 240, 0.4);
     }
 
     #post-form-container {
-        position: fixed; top: 5%; left: 5%; width: 90%;
-        max-height: 85vh; overflow-y: auto; z-index: 1000;
+        position: fixed; top: 10%; left: 5%; width: 90%;
+        max-height: 80vh; overflow-y: auto; z-index: 2000;
     }
 
     #spot-detail-panel {
         bottom: 20px !important; top: auto !important; left: 5% !important;
-        width: 90% !important; transform: none !important;
+        width: 90% !important; position: fixed !important;
     }
 }
 
-/* 詳細パネル・タブ・その他 */
+/* 共通パーツの装飾 */
 #spot-detail-panel {
     position: absolute; top: 70px; left: 20px; width: 320px;
     background: white; z-index: 100; padding: 20px; border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
-.close-detail { float: right; border: none; background: none; font-size: 24px; cursor: pointer; }
-.tab-container { display: flex; border-bottom: 1px solid #eee; margin-bottom: 10px; }
-.tab-btn { flex: 1; padding: 10px; background: none; border: none; font-weight: bold; color: #555; }
-.tab-btn.active { color: #1d9bf0; border-bottom: 3px solid #1d9bf0; }
-.spot-list-item { border-bottom: 1px solid #f0f0f0; padding: 12px 0; }
-.category-badge { font-size: 10px; background: #eee; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
-.action-btn { font-size: 12px; margin: 5px 5px 0 0; padding: 5px 10px; border-radius: 15px; border: 1px solid #ddd; background: white; text-decoration: none; display: inline-block; color: black; }
-input, select, textarea { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-#submit-btn { width: 100%; background: #1d9bf0; color: white; border: none; padding: 12px; border-radius: 25px; font-weight: bold; }
+.close-detail { float: right; border: none; background: none; font-size: 24px; }
+.tab-container { display: flex; border-bottom: 1px solid #eee; margin-bottom: 12px; }
+.tab-btn { flex: 1; padding: 12px; background: none; border: none; font-weight: bold; color: #555; position: relative; }
+.tab-btn.active { color: #1d9bf0; }
+.tab-btn.active::after { content:""; position:absolute; bottom:0; left:20%; width:60%; height:3px; background:#1d9bf0; border-radius:2px; }
+
+.spot-list-item { border-bottom: 1px solid #f5f8fa; padding: 14px 0; }
+.category-badge { font-size: 10px; background: #f0f3f4; color: #536471; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
+
+input, select, textarea { width: 100%; margin-bottom: 12px; padding: 12px; border-radius: 10px; border: 1px solid #cfd9de; font-size: 16px; }
+#submit-btn { width: 100%; background: #1d9bf0; color: white; border: none; padding: 14px; border-radius: 30px; font-weight: bold; }
+
+.action-btn { background: #fff; border: 1px solid #eff3f4; padding: 6px 12px; border-radius: 15px; font-size: 12px; margin-right: 5px; cursor: pointer; text-decoration: none; color: #0f1419; }
+
 .fade-out { opacity: 0; visibility: hidden; transition: 0.5s; }
