@@ -19,12 +19,17 @@ map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccu
 const postFormContainer = document.getElementById('post-form-container');
 const listContainer = document.getElementById('list-container');
 const showFormBtn = document.getElementById('show-form-btn');
+const uiContainer = document.getElementById('ui-container');
 
+// フォーム表示の制御（スマホではUIコンテナごと隠してフォームに集中させる）
 const toggleForm = (show) => {
     postFormContainer.style.display = show ? 'block' : 'none';
     showFormBtn.style.display = show ? 'none' : 'block';
     if (window.innerWidth <= 768) {
+        // スマホではフォーム表示時に下のリストを完全に消す
         listContainer.style.display = show ? 'none' : 'flex';
+        uiContainer.style.background = show ? 'transparent' : 'white';
+        uiContainer.style.boxShadow = show ? 'none' : '0 -4px 15px rgba(0,0,0,0.1)';
     }
 };
 
@@ -55,15 +60,15 @@ function renderSpots() {
     spots.slice(0, 10).forEach(spot => {
         const el = document.createElement('div');
         el.className = 'marker';
-        el.style.cssText = `background:${categoryColors[spot.category] || "#3fb1ce"}; width:24px; height:24px; border-radius:50%; border:2px solid white; cursor:pointer;`;
+        el.style.cssText = `background:${categoryColors[spot.category] || "#3fb1ce"}; width:24px; height:24px; border-radius:50%; border:2px solid white; cursor:pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);`;
         el.onclick = (e) => { e.stopPropagation(); showDetail(spot); };
         markers[spot.id] = new mapboxgl.Marker(el).setLngLat([spot.lng, spot.lat]).addTo(map);
 
         const item = document.createElement('div');
         item.className = 'spot-list-item';
-        item.innerHTML = `<div onclick="showDetail(${JSON.stringify(spot).replace(/"/g, '&quot;')})">
+        item.innerHTML = `<div onclick="showDetail(${JSON.stringify(spot).replace(/"/g, '"')})">
             <strong>${spot.name}</strong><span class="category-badge">${spot.category}</span>
-            <div style="font-size:12px; color:#666;">${spot.comment.substring(0,30)}...</div>
+            <div style="font-size:13px; color:#536471; margin-top:4px;">${spot.comment.substring(0,40)}...</div>
         </div>`;
         listElement.appendChild(item);
     });
@@ -73,13 +78,13 @@ window.showDetail = (spot) => {
     const panel = document.getElementById('spot-detail-panel');
     panel.style.display = 'block';
     document.getElementById('detail-content').innerHTML = `
-        <h3>${spot.name}</h3>
-        <p style="color:#666; font-size:12px;">${spot.category}</p>
-        <p>${spot.comment}</p>
-        ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius:8px;">` : ''}
-        <div style="margin-top:10px;">
+        <h3 style="margin:0;">${spot.name}</h3>
+        <p style="color:#536471; font-size:12px; margin:5px 0;">${spot.category}</p>
+        <p style="font-size:14px; line-height:1.6;">${spot.comment}</p>
+        ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius:12px; margin-bottom:10px;">` : ''}
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
             <button class="action-btn" onclick="likeSpot(${spot.id})">❤️ <span id="lk-${spot.id}">${spot.likes||0}</span></button>
-            <a href="https://www.google.com/maps?q=${spot.lat},${spot.lng}" target="_blank" class="action-btn">GoogleMap</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}" target="_blank" class="action-btn">GoogleMap</a>
             <button class="action-btn" onclick="deleteSpot(${spot.id})" style="color:red;">削除</button>
         </div>
     `;
@@ -89,7 +94,7 @@ window.showDetail = (spot) => {
 map.on('click', (e) => {
     document.getElementById('spot-detail-panel').style.display = 'none';
     selectedLngLat = e.lngLat;
-    document.getElementById('coords-display').innerText = `📍 場所OK！`;
+    document.getElementById('coords-display').innerText = `📍 場所が決まりました！`;
     document.getElementById('submit-btn').disabled = false;
 });
 
@@ -126,7 +131,7 @@ window.likeSpot = (id) => {
 };
 
 window.deleteSpot = (id) => {
-    if(confirm("削除しますか？")) {
+    if(confirm("このスポットを削除しますか？")) {
         localStorage.setItem('touristSpots', JSON.stringify(getSavedSpots().filter(s => s.id !== id)));
         renderSpots();
         document.getElementById('spot-detail-panel').style.display = 'none';
@@ -137,3 +142,5 @@ window.addEventListener('load', () => {
     setTimeout(() => document.getElementById('splash-screen').classList.add('fade-out'), 800);
     renderSpots();
 });
+
+document.getElementById('spot-search').addEventListener('input', renderSpots);
