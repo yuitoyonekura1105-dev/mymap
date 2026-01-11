@@ -15,23 +15,39 @@ map.addControl(new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl:
 let selectedLngLat = null;
 const markers = {};
 
-// パネルの切り替え制御
-window.togglePanel = (type, show) => {
+// パネル制御
+function openPanel(panelId) {
     const list = document.getElementById('list-container');
     const form = document.getElementById('post-form-container');
     const detail = document.getElementById('spot-detail-panel');
 
-    if (type === 'list') {
-        show ? list.classList.add('active') : list.classList.remove('active');
-        if (show) { form.classList.remove('active'); detail.style.display = 'none'; }
-    } else if (type === 'form') {
-        show ? form.classList.add('active') : form.classList.remove('active');
-        if (show) { list.classList.remove('active'); detail.style.display = 'none'; }
+    if (window.innerWidth <= 768) {
+        list.classList.remove('active');
+        form.classList.remove('active');
+        detail.style.display = 'none';
     }
+
+    const target = document.getElementById(panelId);
+    if (target) {
+        target.style.display = 'flex';
+        setTimeout(() => target.classList.add('active'), 10);
+    }
+}
+
+window.closeAllPanels = () => {
+    document.getElementById('list-container').classList.remove('active');
+    document.getElementById('post-form-container').classList.remove('active');
 };
 
-document.getElementById('show-list-btn').addEventListener('click', () => togglePanel('list', true));
-document.getElementById('show-form-btn').addEventListener('click', () => togglePanel('form', true));
+document.getElementById('tab-list-btn').addEventListener('click', () => openPanel('list-container'));
+document.getElementById('tab-post-btn').addEventListener('click', () => openPanel('post-form-container'));
+
+map.on('click', (e) => {
+    selectedLngLat = e.lngLat;
+    document.getElementById('coords-display').innerText = "📍 場所を選択しました";
+    document.getElementById('submit-btn').disabled = false;
+    openPanel('post-form-container');
+});
 
 function getSavedSpots() { return JSON.parse(localStorage.getItem('touristSpots') || "[]"); }
 
@@ -45,35 +61,18 @@ function renderSpots() {
         const marker = new mapboxgl.Marker({ color: categoryColors[spot.category] || "#3fb1ce" })
             .setLngLat([spot.lng, spot.lat])
             .addTo(map);
-        
-        marker.getElement().addEventListener('click', () => showDetail(spot));
         markers[spot.id] = marker;
 
         const item = document.createElement('div');
         item.className = 'spot-list-item';
         item.innerHTML = `<b>${spot.name}</b><p>${spot.comment}</p>`;
-        item.onclick = () => { map.flyTo({center: [spot.lng, spot.lat], zoom: 16}); showDetail(spot); };
+        item.onclick = () => {
+            map.flyTo({center: [spot.lng, spot.lat], zoom: 16});
+            if(window.innerWidth <= 768) closeAllPanels();
+        };
         listElement.appendChild(item);
     });
 }
-
-function showDetail(spot) {
-    const detailPanel = document.getElementById('spot-detail-panel');
-    const content = document.getElementById('detail-content');
-    content.innerHTML = `<h3>${spot.name}</h3><p>${spot.comment}</p>${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius:8px;">` : ''}`;
-    detailPanel.style.display = 'block';
-    if (window.innerWidth <= 768) {
-        togglePanel('list', false);
-        togglePanel('form', false);
-    }
-}
-
-map.on('click', (e) => {
-    selectedLngLat = e.lngLat;
-    document.getElementById('coords-display').innerText = "📍 場所を選択しました";
-    document.getElementById('submit-btn').disabled = false;
-    togglePanel('form', true);
-});
 
 document.getElementById('spot-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -81,11 +80,11 @@ document.getElementById('spot-form').addEventListener('submit', async (e) => {
     const photoDataUrl = photoFile ? await new Promise(r => { const rd = new FileReader(); rd.onload = ev => r(ev.target.result); rd.readAsDataURL(photoFile); }) : "";
 
     const spots = getSavedSpots();
-    spots.push({ id: Date.now(), name: document.getElementById('spot-name').value, category: document.getElementById('spot-category').value, comment: document.getElementById('spot-comment').value, photo: photoDataUrl, lat: selectedLngLat.lat, lng: selectedLngLat.lng, likes: 0 });
+    spots.push({ id: Date.now(), name: document.getElementById('spot-name').value, category: document.getElementById('spot-category').value, comment: document.getElementById('spot-comment').value, photo: photoDataUrl, lat: selectedLngLat.lat, lng: selectedLngLat.lng });
     
     localStorage.setItem('touristSpots', JSON.stringify(spots));
     e.target.reset();
-    togglePanel('form', false);
+    closeAllPanels();
     renderSpots();
 });
 
