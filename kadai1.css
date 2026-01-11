@@ -1,78 +1,102 @@
-/* --- 既存のコードを以下で上書きしてください --- */
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    overflow: hidden;
+    background: #f7f9f9;
+    color: #0f1419;
+}
+#map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 0; }
 
+/* 基本配置（PC） */
+#ui-container {
+    position: absolute; top: 60px; right: 10px; width: 350px;
+    max-height: 90vh; z-index: 10; display: flex; flex-direction: column; gap: 12px;
+}
+
+#post-form-container, #list-container {
+    background: white; padding: 18px; border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%;
+}
+
+#list-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+#spot-list-items { overflow-y: auto; flex-grow: 1; margin-top: 10px; }
+
+.form-header { display: flex; justify-content: space-between; align-items: center; }
+h3 { font-size: 17px; margin: 0; }
+
+#show-form-btn { 
+    background: #1d9bf0; color: white; border: none; padding: 12px; 
+    border-radius: 25px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(29, 155, 240, 0.3);
+}
+
+#hide-form-btn { background: none; border: none; font-size: 24px; color: #536471; cursor: pointer; }
+
+input, select, textarea { 
+    width: 100%; margin-bottom: 10px; padding: 12px; 
+    border-radius: 8px; border: 1px solid #cfd9de; font-size: 16px; 
+}
+
+#submit-btn { 
+    width: 100%; background: #1d9bf0; color: white; border: none; 
+    padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; 
+}
+#submit-btn:disabled { background: #8ecdf8; }
+
+.spot-list-item { 
+    border: 1px solid #eff3f4; border-radius: 12px; padding: 12px; 
+    margin-bottom: 8px; animation: fadeInUp 0.4s ease forwards; 
+}
+.user-name { font-weight: bold; font-size: 14px; }
+.category-badge { background: #f0f3f4; color: #536471; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+.post-content { font-size: 14px; margin-top: 6px; color: #333; }
+
+.card-actions { 
+    display: flex; justify-content: flex-start; gap: 8px; 
+    margin-top: 10px; border-top: 1px solid #eff3f4; padding-top: 8px; flex-wrap: wrap;
+}
+.action-btn { 
+    background: none; border: 1px solid #eff3f4; font-size: 12px; 
+    color: #536471; cursor: pointer; text-decoration: none; 
+    padding: 6px 10px; border-radius: 15px; transition: background 0.2s;
+}
+.action-btn:active { background: #f0f3f4; transform: scale(0.95); }
+
+/* タブ設定 */
+.tab-container { display: flex; border-bottom: 1px solid #eff3f4; margin-bottom: 10px; }
+.tab-btn { 
+    flex: 1; padding: 12px; background: none; border: none; 
+    cursor: pointer; font-weight: bold; color: #536471; position: relative; 
+}
+.tab-btn.active { color: #1d9bf0; }
+.tab-btn.active::after { 
+    content: ""; position: absolute; bottom: 0; left: 15%; 
+    width: 70%; height: 3px; background: #1d9bf0; border-radius: 3px; 
+}
+
+/* ★スマホ用メディアクエリ */
 @media (max-width: 768px) {
     #ui-container {
-        top: auto !important; /* 上固定を解除 */
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-height: 50vh;
-        display: block; /* Flexを解除して縦並びを強制 */
-        background: white;
-        border-radius: 24px 24px 0 0;
-        box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-        padding: 0 15px 20px 15px;
-        z-index: 1000;
+        top: auto !important; bottom: 0; left: 0; right: 0; width: 100%;
+        max-height: 55vh; gap: 0;
     }
-
-    /* ボトムシートの「つまみ」を表示 */
-    #ui-container::before {
-        content: "";
-        display: block;
-        width: 40px;
-        height: 5px;
-        background: #e0e0e0;
-        border-radius: 10px;
-        margin: 10px auto 15px auto;
+    #post-form-container, #list-container {
+        border-radius: 20px 20px 0 0;
+        max-height: 55vh;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
     }
-
-    #list-container {
-        display: block; /* 内部のFlexを解除 */
-        padding: 0;
-        max-height: 40vh;
-        overflow-y: auto;
-    }
-
-    /* タブを横いっぱいに並べる */
-    .tab-container, #list-container > div:first-child {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100%;
-        margin-bottom: 15px;
-    }
-
-    .tab-btn {
-        flex: 1;
-        text-align: center;
-    }
-
-    /* 検索バーを独立させる */
-    #spot-search {
-        width: 100%;
-        margin-bottom: 15px;
-        display: block;
-    }
-
-    /* 投稿ボタンを右下に固定（リストの中に入れない） */
     #show-form-btn {
-        position: fixed;
-        bottom: 25px;
-        right: 20px;
-        width: auto !important;
-        height: 50px;
-        border-radius: 25px;
-        padding: 0 20px;
-        z-index: 1100;
-        box-shadow: 0 4px 15px rgba(29, 155, 240, 0.4);
-        margin: 0;
-        font-size: 14px;
+        position: fixed; bottom: 20px; right: 20px; width: auto; 
+        padding: 15px 20px; z-index: 100;
     }
-
-    /* タイムラインの各アイテム */
-    .spot-list-item {
-        width: 100%;
-        margin-bottom: 12px;
-        display: block;
+    #spot-detail-panel {
+        width: 90% !important; left: 5% !important; top: 15% !important;
     }
 }
+
+/* アニメーション類 */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes splash-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.fade-out { opacity: 0; visibility: hidden; transition: opacity 0.8s; }
