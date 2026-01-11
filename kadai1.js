@@ -40,9 +40,39 @@ const postFormContainer = document.getElementById('post-form-container');
 const showFormBtn = document.getElementById('show-form-btn');
 const hideFormBtn = document.getElementById('hide-form-btn');
 
+// toggleForm 関数を以下のように書き換えてください
 const toggleForm = (show) => {
-    if(postFormContainer) postFormContainer.style.display = show ? 'block' : 'none';
+    const form = document.getElementById('post-form-container');
+    const list = document.getElementById('list-container');
+    const showBtn = document.getElementById('show-form-btn');
+
+    if (show) {
+        form.classList.add('active'); // スマホ用アニメーション
+        form.style.display = 'block';
+        list.style.display = 'none';
+        if (window.innerWidth <= 768) showBtn.style.display = 'none';
+    } else {
+        form.classList.remove('active');
+        setTimeout(() => { if(!form.classList.contains('active')) form.style.display = 'none'; }, 300);
+        list.style.display = 'block';
+        showBtn.style.display = 'block';
+    }
 };
+
+// 地図クリック時の挙動もスマホ最適化
+map.on('click', (e) => {
+    document.getElementById('spot-detail-panel').style.display = 'none';
+    selectedLngLat = e.lngLat;
+    
+    // 座標選択メッセージを強調
+    const coordsDisp = document.getElementById('coords-display');
+    coordsDisp.innerText = `📍 場所を決定しました！`;
+    coordsDisp.style.color = "#1d9bf0";
+    coordsDisp.style.fontWeight = "bold";
+    
+    document.getElementById('submit-btn').disabled = false;
+    toggleForm(true);
+});
 
 if(showFormBtn) showFormBtn.addEventListener('click', () => toggleForm(true));
 if(hideFormBtn) hideFormBtn.addEventListener('click', () => toggleForm(false));
