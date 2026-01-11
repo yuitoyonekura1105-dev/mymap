@@ -7,43 +7,41 @@ const map = new mapboxgl.Map({
     zoom: 14
 });
 
-const categoryColors = { "🍽️ グルメ": "#ff4500", "🏞️ 絶景・風景": "#2e8b57", "🛍️ ショッピング": "#ba55d3", "🏛️ 歴史・文化": "#8b4513", "☕ カフェ・休憩": "#deb887", "✨ その他": "#3fb1ce" };
+const categoryColors = { 
+    "🍽️ グルメ": "#ff4500", "🏞️ 絶景・風景": "#2e8b57", 
+    "🛍️ ショッピング": "#ba55d3", "🏛️ 歴史・文化": "#8b4513", 
+    "☕ カフェ・休憩": "#deb887", "✨ その他": "#3fb1ce" 
+};
+
 let currentTab = 'latest';
 let selectedLngLat = null;
 const markers = {};
 
+// コントロール
 map.addControl(new MapboxLanguage({ defaultLanguage: 'ja' }));
 map.addControl(new MapboxGeocoder({ 
     accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl, 
-    placeholder: '場所を検索', language: 'ja', countries: 'jp'
+    placeholder: '場所を検索', language: 'ja', countries: 'jp', types: 'poi,place,address' 
 }), 'top-left');
 map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }), 'top-right');
 
 const postFormContainer = document.getElementById('post-form-container');
 const listContainer = document.getElementById('list-container');
 const showFormBtn = document.getElementById('show-form-btn');
+const hideFormBtn = document.getElementById('hide-form-btn');
 
-// 表示切り替えの修正
+const getSavedSpots = () => JSON.parse(localStorage.getItem('touristSpots') || "[]");
+
+// フォームの表示切り替え（スマホ時にリストを隠す）
 const toggleForm = (show) => {
     if (show) {
         postFormContainer.style.display = 'block';
-        listContainer.style.display = 'none';
-        showFormBtn.style.display = 'none';
+        if (window.innerWidth <= 768) listContainer.style.display = 'none';
     } else {
         postFormContainer.style.display = 'none';
-        listContainer.style.display = 'block';
-        showFormBtn.style.display = 'block';
-        // フォームのリセット
-        document.getElementById('spot-form').reset();
-        document.getElementById('submit-btn').disabled = true;
-        document.getElementById('coords-display').innerText = "地図をクリックして場所を選択してください";
+        listContainer.style.display = 'flex';
     }
 };
-
-showFormBtn.addEventListener('click', () => toggleForm(true));
-document.getElementById('hide-form-btn').addEventListener('click', () => toggleForm(false));
-
-function getSavedSpots() { return JSON.parse(localStorage.getItem('touristSpots') || "[]"); }
 
 window.switchTab = (tab) => {
     currentTab = tab;
@@ -55,21 +53,23 @@ window.switchTab = (tab) => {
 function renderSpots() {
     Object.values(markers).forEach(m => m.remove());
     const listElement = document.getElementById('spot-list-items');
+    if (!listElement) return;
     listElement.innerHTML = '';
-    let spots = getSavedSpots();
 
-    const searchQuery = document.getElementById('spot-search')?.value.toLowerCase() || "";
-    if (searchQuery) {
-        spots = spots.filter(s => (s.name + s.comment).toLowerCase().includes(searchQuery));
+    let spots = getSavedSpots();
+    const query = document.getElementById('spot-search')?.value.toLowerCase();
+    if (query) {
+        spots = spots.filter(s => (s.name + s.comment + s.category).toLowerCase().includes(query));
     }
 
-    if (currentTab === 'latest') spots.sort((a, b) => b.id - a.id);
-    else spots.sort(() => Math.random() - 0.5);
+    if (currentTab === 'latest') { spots.sort((a, b) => b.id - a.id); } 
+    else { spots.sort(() => Math.random() - 0.5); }
 
-    spots.forEach(spot => {
+    spots.slice(0, 10).forEach(spot => {
         const el = document.createElement('div');
-        el.style.cssText = `background:${categoryColors[spot.category] || '#1d9bf0'}; width:24px; height:24px; border-radius:50%; border:2px solid white; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);`;
-
+        el.className = 'marker';
+        el.style.cssText = `background:${categoryColors[spot.category]}; width:22px; height:22px; border-radius:50%; border:2px solid white; cursor:pointer;`;
+        
         el.addEventListener('click', (e) => {
             e.stopPropagation();
             showDetail(spot);
@@ -80,9 +80,15 @@ function renderSpots() {
         const item = document.createElement('div');
         item.className = 'spot-list-item';
         item.innerHTML = `
-            <div onclick="showDetailById(${spot.id})">
-                <span style="font-weight:bold;">${spot.name}</span> <small style="color:#536471;">${spot.category}</small>
-                <div style="font-size:13px; color:#536471; margin-top:4px;">${spot.comment.substring(0,30)}...</div>
+            <div onclick="focusSpot(${spot.lng}, ${spot.lat})" style="cursor:pointer;">
+                <div class="card-header"><span class="user-name">👤 ${spot.name}</span> <span class="category-badge">${spot.category}</span></div>
+                <div class="post-content">${spot.comment}</div>
+            </div>
+            <div class="card-actions">
+                <button class="action-btn" onclick="likeSpot(${spot.id})">❤️ <span id="l-likes-${spot.id}">${spot.likes || 0}</span></button>
+                <button class="action-btn" onclick="speakSpot(${spot.id})">🔊</button>
+                <a href="https://www.google.com/maps?q=${spot.lat},${spot.lng}" target="_blank" class="action-btn">🌐 地図</a>
+                <button class="action-btn" onclick="deleteSpot(${spot.id})" style="color:#e0245e;">🗑️</button>
             </div>`;
         listElement.appendChild(item);
     });
@@ -92,25 +98,21 @@ window.showDetail = (spot) => {
     const panel = document.getElementById('spot-detail-panel');
     const content = document.getElementById('detail-content');
     content.innerHTML = `
-        <h3 style="margin:0 0 10px 0;">${spot.name}</h3>
-        <p style="font-size:14px; color:#536471; margin-bottom:5px;">${spot.category}</p>
-        <p style="font-size:15px; line-height:1.5; margin-bottom:15px;">${spot.comment}</p>
-        ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius:12px; margin-bottom:15px; max-height:200px; object-fit:cover;">` : ''}
-        <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            <button class="action-btn" onclick="likeSpot(${spot.id})">❤️ <span id="like-count-${spot.id}">${spot.likes||0}</span></button>
-            <button class="action-btn" onclick="speakSpot(${spot.id})">🔊 読み上げ</button>
-            <a href="https://www.google.com/maps?q=${spot.lat},${spot.lng}" target="_blank" class="action-btn">🌐 GoogleMap</a>
-            <button class="action-btn" onclick="deleteSpot(${spot.id})" style="color:red; border-color:red;">🗑️ 削除</button>
-        </div>
-    `;
+        <div style="font-weight:bold; font-size:18px;">${spot.name}</div>
+        <div style="color:#536471; font-size:12px; margin-bottom:8px;">${spot.category}</div>
+        <div style="font-size:14px; margin-bottom:12px;">${spot.comment}</div>
+        ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius:12px; margin-bottom:10px;">` : ''}
+        <div class="card-actions">
+            <button class="action-btn" onclick="likeSpot(${spot.id})">❤️ <span id="d-likes-${spot.id}">${spot.likes || 0}</span></button>
+            ${spot.link ? `<a href="${spot.link}" target="_blank" class="action-btn">🔗 ウェブ</a>` : ''}
+        </div>`;
     panel.style.display = 'block';
-    toggleForm(false);
     map.flyTo({ center: [spot.lng, spot.lat], zoom: 16 });
 };
 
-window.showDetailById = (id) => {
-    const spot = getSavedSpots().find(s => s.id === id);
-    if(spot) showDetail(spot);
+window.focusSpot = (lng, lat) => {
+    if (window.innerWidth <= 768) { /* スマホ時は詳細を出しやすくする工夫 */ }
+    map.flyTo({ center: [lng, lat], zoom: 16 });
 };
 
 map.on('click', (e) => {
@@ -118,15 +120,18 @@ map.on('click', (e) => {
     selectedLngLat = e.lngLat;
     document.getElementById('coords-display').innerText = `📍 場所を選択しました`;
     document.getElementById('submit-btn').disabled = false;
-    if (postFormContainer.style.display === 'none') {
-        toggleForm(true);
-    }
+    toggleForm(true);
 });
+
+showFormBtn.addEventListener('click', () => toggleForm(true));
+hideFormBtn.addEventListener('click', () => toggleForm(false));
 
 document.getElementById('spot-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const photoFile = document.getElementById('spot-photo-file').files[0];
-    const photoDataUrl = photoFile ? await new Promise(r => { const rd = new FileReader(); rd.onload = ev => r(ev.target.result); rd.readAsDataURL(photoFile); }) : "";
+    const photoDataUrl = photoFile ? await new Promise(r => { 
+        const rd = new FileReader(); rd.onload = ev => r(ev.target.result); rd.readAsDataURL(photoFile); 
+    }) : "";
 
     const spots = getSavedSpots();
     spots.push({
@@ -136,12 +141,14 @@ document.getElementById('spot-form').addEventListener('submit', async (e) => {
         comment: document.getElementById('spot-comment').value,
         link: document.getElementById('spot-link').value,
         photo: photoDataUrl,
-        lat: selectedLngLat.lat, lng: selectedLngLat.lng,
+        lat: selectedLngLat.lat,
+        lng: selectedLngLat.lng,
         likes: 0
     });
 
     localStorage.setItem('touristSpots', JSON.stringify(spots));
-    toggleForm(false); // これでリストが表示される
+    e.target.reset();
+    toggleForm(false);
     renderSpots();
 });
 
@@ -151,16 +158,17 @@ window.likeSpot = (id) => {
     if (s) {
         s.likes = (s.likes || 0) + 1;
         localStorage.setItem('touristSpots', JSON.stringify(spots));
-        const countSpan = document.getElementById(`like-count-${id}`);
-        if(countSpan) countSpan.innerText = s.likes;
+        ['l-likes-', 'd-likes-'].forEach(p => {
+            const el = document.getElementById(p + id);
+            if (el) el.innerText = s.likes;
+        });
     }
 };
 
 window.deleteSpot = (id) => {
-    if(confirm("削除しますか？")) {
+    if (confirm("削除しますか？")) {
         localStorage.setItem('touristSpots', JSON.stringify(getSavedSpots().filter(s => s.id !== id)));
         renderSpots();
-        document.getElementById('spot-detail-panel').style.display = 'none';
     }
 };
 
@@ -168,7 +176,7 @@ window.speakSpot = (id) => {
     const spot = getSavedSpots().find(x => x.id === id);
     if (!spot) return;
     window.speechSynthesis.cancel();
-    const uttr = new SpeechSynthesisUtterance(`${spot.name}。おすすめポイントは、${spot.comment}`);
+    const uttr = new SpeechSynthesisUtterance(`${spot.name}。${spot.comment}`);
     uttr.lang = 'ja-JP';
     window.speechSynthesis.speak(uttr);
 };
@@ -177,5 +185,3 @@ window.addEventListener('load', () => {
     setTimeout(() => document.getElementById('splash-screen').classList.add('fade-out'), 1000);
     renderSpots();
 });
-
-document.getElementById('spot-search').addEventListener('input', renderSpots);
