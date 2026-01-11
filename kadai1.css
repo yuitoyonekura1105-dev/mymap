@@ -1,106 +1,78 @@
-* { box-sizing: border-box; }
-body {
-    margin: 0; padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    overflow: hidden; background: #f7f9f9; color: #0f1419;
-}
+/* --- 既存のコードを以下で上書きしてください --- */
 
-#map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 0; }
-
-/* --- PCレイアウト --- */
-#ui-container {
-    position: absolute; top: 10px; right: 10px; width: 350px;
-    max-height: 95vh; z-index: 10; display: flex; flex-direction: column; gap: 12px;
-}
-
-#post-form-container, #list-container {
-    background: white; padding: 18px; border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%;
-}
-
-.form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.form-header h3 { margin: 0; font-size: 18px; }
-#hide-form-btn { border: none; background: none; font-size: 24px; cursor: pointer; color: #536471; }
-
-/* --- スマホ共通パーツ --- */
-.mobile-handle { display: none; }
-
-/* --- 投稿・リスト共通 --- */
-#show-form-btn { 
-    background: #1d9bf0; color: white; border: none; padding: 14px; 
-    border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 16px;
-    box-shadow: 0 4px 12px rgba(29, 155, 240, 0.3);
-}
-
-.tab-container { display: flex; margin-bottom: 15px; border-bottom: 1px solid #eff3f4; }
-.tab-btn {
-    flex: 1; padding: 12px; background: none; border: none;
-    cursor: pointer; font-weight: bold; color: #536471; position: relative;
-}
-.tab-btn.active { color: #1d9bf0; }
-.tab-btn.active::after {
-    content: ""; position: absolute; bottom: 0; left: 20%; width: 60%; height: 3px;
-    background: #1d9bf0; border-radius: 3px;
-}
-
-input, select, textarea { 
-    width: 100%; margin-bottom: 12px; padding: 12px; 
-    border-radius: 8px; border: 1px solid #cfd9de; font-size: 16px; 
-}
-#submit-btn { 
-    width: 100%; background: #1d9bf0; color: white; border: none; 
-    padding: 14px; border-radius: 28px; font-weight: bold; cursor: pointer; 
-}
-#submit-btn:disabled { background: #8ecdf8; }
-
-#spot-list-items { overflow-y: auto; max-height: 60vh; }
-.spot-list-item { 
-    border-bottom: 1px solid #eff3f4; padding: 15px 5px; cursor: pointer;
-    animation: fadeInUp 0.4s ease forwards;
-}
-
-.action-btn { 
-    background: #f0f3f4; border: none; padding: 6px 12px; 
-    border-radius: 15px; font-size: 12px; color: #0f1419; text-decoration: none; cursor: pointer;
-}
-
-/* --- 詳細パネル --- */
-#spot-detail-panel {
-    position: absolute; top: 20px; left: 20px; width: 320px;
-    background: white; z-index: 100; padding: 20px; border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-.close-detail { float: right; border: none; background: none; font-size: 20px; cursor: pointer; }
-
-/* --- スマホ専用設定 (768px以下) --- */
 @media (max-width: 768px) {
     #ui-container {
-        top: auto; right: 0; bottom: 0; left: 0; width: 100%;
-        max-height: 70vh; gap: 0;
-        display: block; /* Flexを解除して縦に並べる */
+        top: auto !important; /* 上固定を解除 */
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 50vh;
+        display: block; /* Flexを解除して縦並びを強制 */
+        background: white;
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        padding: 0 15px 20px 15px;
+        z-index: 1000;
     }
-    #post-form-container, #list-container { 
-        border-radius: 20px 20px 0 0; 
-        padding: 20px;
-        display: block; /* 投稿後に確実に表示させる */
-    }
-    .mobile-handle {
-        display: block; width: 40px; height: 5px; background: #ccd6dd;
-        border-radius: 10px; margin: -10px auto 15px auto;
-    }
-    #show-form-btn {
-        position: fixed; bottom: 20px; right: 20px; width: auto;
-        padding: 15px 20px; z-index: 11;
-    }
-    #spot-detail-panel {
-        top: auto; left: 0; bottom: 0; width: 100%; border-radius: 20px 20px 0 0;
-    }
-}
 
-/* --- スプラッシュ画面 --- */
-#splash-screen {
-    position: fixed; inset: 0; background-color: #e9967a;
-    display: flex; justify-content: center; align-items: center; z-index: 99999;
+    /* ボトムシートの「つまみ」を表示 */
+    #ui-container::before {
+        content: "";
+        display: block;
+        width: 40px;
+        height: 5px;
+        background: #e0e0e0;
+        border-radius: 10px;
+        margin: 10px auto 15px auto;
+    }
+
+    #list-container {
+        display: block; /* 内部のFlexを解除 */
+        padding: 0;
+        max-height: 40vh;
+        overflow-y: auto;
+    }
+
+    /* タブを横いっぱいに並べる */
+    .tab-container, #list-container > div:first-child {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .tab-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    /* 検索バーを独立させる */
+    #spot-search {
+        width: 100%;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    /* 投稿ボタンを右下に固定（リストの中に入れない） */
+    #show-form-btn {
+        position: fixed;
+        bottom: 25px;
+        right: 20px;
+        width: auto !important;
+        height: 50px;
+        border-radius: 25px;
+        padding: 0 20px;
+        z-index: 1100;
+        box-shadow: 0 4px 15px rgba(29, 155, 240, 0.4);
+        margin: 0;
+        font-size: 14px;
+    }
+
+    /* タイムラインの各アイテム */
+    .spot-list-item {
+        width: 100%;
+        margin-bottom: 12px;
+        display: block;
+    }
 }
-.fade-out { opacity: 0; visibility: hidden; transition: opacity 0.8s; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
