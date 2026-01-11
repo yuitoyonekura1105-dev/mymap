@@ -1,11 +1,8 @@
 * { box-sizing: border-box; }
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    overflow: hidden;
-    background: #f7f9f9;
-    color: #0f1419;
+    overflow: hidden; background: #f7f9f9; color: #0f1419;
 }
 
 #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 0; }
@@ -21,8 +18,12 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%;
 }
 
+.form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.form-header h3 { margin: 0; font-size: 18px; }
+#hide-form-btn { border: none; background: none; font-size: 24px; cursor: pointer; color: #536471; }
+
 /* --- スマホ共通パーツ --- */
-.mobile-handle { display: none; } /* デフォルト非表示 */
+.mobile-handle { display: none; }
 
 /* --- 投稿・リスト共通 --- */
 #show-form-btn { 
@@ -52,66 +53,54 @@ input, select, textarea {
 }
 #submit-btn:disabled { background: #8ecdf8; }
 
+#spot-list-items { overflow-y: auto; max-height: 60vh; }
 .spot-list-item { 
-    border-bottom: 1px solid #eff3f4; padding: 15px 5px; 
+    border-bottom: 1px solid #eff3f4; padding: 15px 5px; cursor: pointer;
     animation: fadeInUp 0.4s ease forwards;
 }
-.card-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+
 .action-btn { 
     background: #f0f3f4; border: none; padding: 6px 12px; 
-    border-radius: 15px; font-size: 12px; color: #0f1419; text-decoration: none;
+    border-radius: 15px; font-size: 12px; color: #0f1419; text-decoration: none; cursor: pointer;
 }
 
 /* --- 詳細パネル --- */
 #spot-detail-panel {
-    position: absolute; top: 20px; left: 20px; width: 300px;
+    position: absolute; top: 20px; left: 20px; width: 320px;
     background: white; z-index: 100; padding: 20px; border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
+.close-detail { float: right; border: none; background: none; font-size: 20px; cursor: pointer; }
 
 /* --- スマホ専用設定 (768px以下) --- */
 @media (max-width: 768px) {
     #ui-container {
         top: auto; right: 0; bottom: 0; left: 0; width: 100%;
-        max-height: 70vh; gap: 0; z-index: 10;
+        max-height: 70vh; gap: 0;
+        display: block; /* Flexを解除して縦に並べる */
     }
-
-    #post-form-container, #list-container {
-        border-radius: 20px 20px 0 0;
+    #post-form-container, #list-container { 
+        border-radius: 20px 20px 0 0; 
         padding: 20px;
-        max-height: 70vh;
-        overflow-y: auto;
+        display: block; /* 投稿後に確実に表示させる */
     }
-
     .mobile-handle {
         display: block; width: 40px; height: 5px; background: #ccd6dd;
         border-radius: 10px; margin: -10px auto 15px auto;
     }
-
     #show-form-btn {
         position: fixed; bottom: 20px; right: 20px; width: auto;
-        padding: 15px 20px; border-radius: 30px; z-index: 11;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        padding: 15px 20px; z-index: 11;
     }
-
     #spot-detail-panel {
-        top: auto; left: 0; bottom: 0; width: 100%;
-        border-radius: 20px 20px 0 0; padding-top: 15px;
+        top: auto; left: 0; bottom: 0; width: 100%; border-radius: 20px 20px 0 0;
     }
-    
-    .close-detail { position: absolute; right: 15px; top: 15px; border: none; background: #f0f3f4; border-radius: 50%; width: 30px; height: 30px; }
-    
-    #spot-list-items { max-height: 50vh; }
 }
 
-/* --- アニメーション --- */
+/* --- スプラッシュ画面 --- */
 #splash-screen {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background-color: #e9967a; display: flex; justify-content: center;
-    align-items: center; z-index: 99999; transition: opacity 0.8s;
+    position: fixed; inset: 0; background-color: #e9967a;
+    display: flex; justify-content: center; align-items: center; z-index: 99999;
 }
-.splash-title { color: white; font-size: 1.5rem; animation: splash-pulse 1.5s infinite; }
-@keyframes splash-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
-.fade-out { opacity: 0; visibility: hidden; }
-
+.fade-out { opacity: 0; visibility: hidden; transition: opacity 0.8s; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
