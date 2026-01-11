@@ -9,33 +9,32 @@
     <link rel="stylesheet" href="kadai1.css"> 
 </head>
 <body>
-    <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #e9967a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999;">
-        <div style="font-size: 50px; margin-bottom: 20px;">🗺️</div>
-        <h1 style="color: white; font-size: 1.2rem; letter-spacing: 2px;">LOADING...</h1>
+    <div id="splash-screen">
+        <h1 class="splash-title">マップロード中...</h1>
     </div>
 
     <div id="map"></div>
 
-    <div id="ui-container">
-        <div class="mobile-action-bar">
-            <button id="show-list-btn">🕒 タイムライン</button>
-            <button id="show-form-btn">＋ 投稿する</button>
-        </div>
+    <div class="mobile-tabs">
+        <button id="tab-list-btn">🕒 タイムライン</button>
+        <button id="tab-post-btn" style="background: #1d9bf0; color: white;">＋ 投稿する</button>
+    </div>
 
+    <div id="ui-container">
         <div id="list-container">
-            <div class="modal-pull-bar"></div>
+            <div class="modal-pull-bar mobile-only"></div>
             <div class="list-header">
                 <h3>🕒 最新のタイムライン</h3>
-                <button class="panel-close-btn" onclick="togglePanel('list', false)">×</button>
+                <button class="mobile-only panel-close-x" onclick="closeAllPanels()">×</button>
             </div>
             <div id="spot-list-items"></div>
         </div>
 
         <div id="post-form-container">
-            <div class="modal-pull-bar"></div>
+            <div class="modal-pull-bar mobile-only"></div>
             <div class="form-header">
                 <h3>📍 スポットを登録</h3>
-                <button class="panel-close-btn" onclick="togglePanel('form', false)">×</button>
+                <button class="panel-close-x" onclick="closeAllPanels()">×</button>
             </div>
             <p id="coords-display">地図をタップして場所を選択</p>
             <form id="spot-form">
@@ -44,13 +43,11 @@
                     <option value="🍽️ グルメ">🍽️ グルメ</option>
                     <option value="🏞️ 絶景・風景">🏞️ 絶景・風景</option>
                     <option value="🛍️ ショッピング">🛍️ ショッピング</option>
-                    <option value="🏛️ 歴史・文化">🏛️ 歴史・文化</option>
                     <option value="☕ カフェ・休憩">☕ カフェ・休憩</option>
                     <option value="✨ その他">✨ その他</option>
                 </select>
                 <textarea id="spot-comment" placeholder="おすすめポイントを記入してください" required></textarea>
-                <input type="url" id="spot-link" placeholder="WebサイトURL(任意)">
-                <div style="font-size:12px; margin-bottom:5px;">写真を選択:</div>
+                <div style="font-size:12px; margin-bottom:5px;">写真を選択 (任意):</div>
                 <input type="file" id="spot-photo-file" accept="image/*">
                 <button type="submit" id="submit-btn" disabled>投稿を完了する</button>
             </form>
@@ -59,7 +56,7 @@
 
     <div id="spot-detail-panel" style="display:none;">
         <div class="modal-pull-bar mobile-only"></div>
-        <button onclick="document.getElementById('spot-detail-panel').style.display='none'" class="detail-close-btn">×</button>
+        <button onclick="document.getElementById('spot-detail-panel').style.display='none'" class="panel-close-x">×</button>
         <div id="detail-content"></div>
     </div>
 
